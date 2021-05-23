@@ -1,0 +1,58 @@
+name: CMake
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Install MSVC compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        toolset: 14.2
+        arch: x64
+
+    - name: Setup Ninja
+      uses: ashutoshvarma/setup-ninja@v1.1
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 6.1.0
+        arch: win64_msvc2019_64
+
+    - name: Configure CMake
+      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=installed -GNinja -DALL_PLUGINS=ON
+
+    - name: Build
+      run: cmake --build ${{ github.workspace }}/build
+
+    - name: Installation
+      run: cmake --install ${{ github.workspace }}/build
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: QvPlugin-${{ runner.os }}
+        path: installed/
