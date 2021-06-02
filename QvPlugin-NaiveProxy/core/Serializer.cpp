@@ -2,7 +2,7 @@
 
 #include <QUrlQuery>
 
-std::optional<QString> NaiveProxyOutboundHandler::Serialize(const PluginOutboundInfo &info) const
+std::optional<QString> NaiveProxyOutboundHandler::Serialize(const PluginOutboundDescriptor &info) const
 {
     if (info.Protocol != "naive")
         return std::nullopt;
@@ -34,9 +34,9 @@ std::optional<QString> NaiveProxyOutboundHandler::Serialize(const PluginOutbound
     return url.toString();
 }
 
-std::optional<PluginOutboundInfo> NaiveProxyOutboundHandler::Deserialize(const QString &link) const
+std::optional<PluginOutboundDescriptor> NaiveProxyOutboundHandler::Deserialize(const QString &link) const
 {
-    PluginOutboundInfo info;
+    PluginOutboundDescriptor info;
     QUrl url(link);
     if (!url.isValid())
         return std::nullopt;
@@ -57,23 +57,23 @@ std::optional<PluginOutboundInfo> NaiveProxyOutboundHandler::Deserialize(const Q
     return info;
 }
 
-bool NaiveProxyOutboundHandler::SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginOutboundData &info) const
+bool NaiveProxyOutboundHandler::SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginIOBoundData &info) const
 {
     if (protocol != "naive")
         return false;
-    if (info.contains(DATA_KEY_SERVER))
-        outbound["host"] = info[DATA_KEY_SERVER].toString();
-    if (info.contains(DATA_KEY_PORT))
-        outbound["port"] = info[DATA_KEY_PORT].toInt();
-    if (info.contains(DATA_KEY_SNI))
-        outbound["sni"] = info[DATA_KEY_SNI].toString();
+    if (info.contains(IOBOUND::ADDRESS))
+        outbound["host"] = info[IOBOUND::ADDRESS].toString();
+    if (info.contains(IOBOUND::PORT))
+        outbound["port"] = info[IOBOUND::PORT].toInt();
+    if (info.contains(IOBOUND::SNI))
+        outbound["sni"] = info[IOBOUND::SNI].toString();
     return true;
 }
 
-std::optional<PluginOutboundData> NaiveProxyOutboundHandler::GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const
+std::optional<PluginIOBoundData> NaiveProxyOutboundHandler::GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const
 {
-    return PluginOutboundData{ { DATA_KEY_PROTOCOL, protocol },
-                               { DATA_KEY_SERVER, outbound["host"].toString() },
-                               { DATA_KEY_PORT, outbound["port"].toInt() },
-                               { DATA_KEY_SNI, outbound["sni"].toString() } };
+    return PluginIOBoundData{ { IOBOUND::PROTOCOL, protocol },
+                              { IOBOUND::ADDRESS, outbound["host"].toString() },
+                              { IOBOUND::PORT, outbound["port"].toInt() },
+                              { IOBOUND::SNI, outbound["sni"].toString() } };
 }

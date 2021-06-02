@@ -19,25 +19,21 @@ class NaiveProxyPlugin
     // Basic metainfo of this plugin
     const QvPluginMetadata GetMetadata() const override
     {
-        return QvPluginMetadata{ "NaiveProxy Plugin",     //
-                                 "Qv2ray Workgroup",      //
-                                 "qvplugin_naiveproxy",   //
-                                 "NaiveProxy Plugin.",    //
-                                 "v3.0.0",                //
-                                 "Qv2ray/QvPlugin-Naive", //
+        return QvPluginMetadata{ "NaiveProxy Plugin",   //
+                                 "Qv2ray Workgroup",    //
+                                 "qvplugin_naiveproxy", //
+                                 "NaiveProxy Plugin.",  //
+                                 "",                    //
                                  {
                                      COMPONENT_GUI,             //
                                      COMPONENT_KERNEL,          //
                                      COMPONENT_OUTBOUND_HANDLER //
-                                 },
-                                 UPDATE_GITHUB_RELEASE };
+                                 } };
     }
-    bool InitializePlugin(const QString &, const QJsonObject &) override;
+    bool InitializePlugin() override;
     void SettingsUpdated() override{};
 
   signals:
     void PluginLog(QString) const override;
     void PluginErrorMessageBox(QString, QString) const override;
 };
-
-DECLARE_PLUGIN_INSTANCE(NaiveProxyPlugin);

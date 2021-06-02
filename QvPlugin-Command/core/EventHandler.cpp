@@ -17,7 +17,7 @@ void SimpleEventHandler::ProcessEvent(const Connectivity::EventObject &pluginEve
     ///  --> port for that protocol, (e.g. $INBOUND_http as HTTP port)
     ///
     CommandPluginConfig settings;
-    settings.loadJson(CommandPluginInstance->GetSettings());
+    settings.loadJson(PluginInstance->GetSettings());
 
     QStringList actions;
     switch (pluginEvent.Type)
@@ -58,7 +58,7 @@ void SimpleEventHandler::ProcessEvent(const Connectivity::EventObject &pluginEve
             auto returnvalue = QProcess::execute(_command);
             if (returnvalue != 0)
             {
-                CommandPluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
+                PluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
             }
         }
         else
@@ -76,7 +76,7 @@ void SimpleEventHandler::ProcessEvent(const SystemProxy::EventObject &pluginEven
     /// $$SOCKS: SOCKS port (could be 0)
     ///
     CommandPluginConfig settings;
-    settings.loadJson(CommandPluginInstance->GetSettings());
+    settings.loadJson(PluginInstance->GetSettings());
     QStringList actions;
     switch (pluginEvent.State)
     {
@@ -104,7 +104,7 @@ void SimpleEventHandler::ProcessEvent(const SystemProxy::EventObject &pluginEven
             auto returnvalue = QProcess::execute(_command);
             if (returnvalue != 0)
             {
-                CommandPluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
+                PluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
             }
         }
         else
@@ -123,7 +123,7 @@ void SimpleEventHandler::ProcessEvent(const ConnectionEntry::EventObject &plugin
     ///
 
     CommandPluginConfig settings;
-    settings.loadJson(CommandPluginInstance->GetSettings());
+    settings.loadJson(PluginInstance->GetSettings());
 
     QStringList actions;
     switch (pluginEvent.Type)
@@ -166,7 +166,7 @@ void SimpleEventHandler::ProcessEvent(const ConnectionEntry::EventObject &plugin
             auto returnvalue = QProcess::execute(_command);
             if (returnvalue != 0)
             {
-                CommandPluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
+                PluginInstance->PluginLog("Failed to execute command : \"" + action + "\"");
             }
         }
         else

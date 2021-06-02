@@ -1,6 +1,3 @@
 [submodule "plugin-interface"]
 	path = plugin-interface
 	url = https://github.com/Shadowsocks-NET/QvPlugin-Interface.git
-[submodule "3rdparty/QJsonStruct"]
-	path = 3rdparty/QJsonStruct
-	url = https://github.com/Shadowsocks-NET/QJsonStruct.git

@@ -6,8 +6,6 @@ set(CMAKE_PROJECT_VERSION_MAJOR 0)
 set(CMAKE_PROJECT_VERSION_MINOR 0)
 set(CMAKE_PROJECT_VERSION_PATCH 0)
 
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty/QJsonStruct)
-
 option(ALL_PLUGINS OFF)
 
 macro(plugin_collection name)

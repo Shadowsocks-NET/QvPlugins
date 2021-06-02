@@ -3,11 +3,9 @@
 #include "ui/CommandPluginSettings.hpp"
 #include "ui/GUIInterface.hpp"
 
-bool CommandPlugin::InitializePlugin(const QString &, const QJsonObject &conf)
+bool CommandPlugin::InitializePlugin()
 {
-    settings = conf;
-    CommandPluginInstance = this;
-    eventHandler = std::make_shared<SimpleEventHandler>();
-    guiInterface = new CommandGUIInterface();
+    m_EventHandler = std::make_shared<SimpleEventHandler>();
+    m_GUIInterface = new CommandGUIInterface();
     return true;
 }

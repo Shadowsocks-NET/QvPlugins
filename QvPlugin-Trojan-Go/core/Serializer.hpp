@@ -14,7 +14,7 @@ class TrojanGoSerializer : public PluginOutboundHandler
 {
   public:
     explicit TrojanGoSerializer() : PluginOutboundHandler(){};
-    std::optional<QString> Serialize(const PluginOutboundInfo &outbound) const override
+    std::optional<QString> Serialize(const PluginOutboundDescriptor &outbound) const override
     {
         TrojanGoShareLinkObject obj;
         obj.loadJson(outbound.Outbound);
@@ -50,9 +50,9 @@ class TrojanGoSerializer : public PluginOutboundHandler
         return url.toString(QUrl::FullyEncoded);
     }
 
-    std::optional<PluginOutboundInfo> Deserialize(const QString &url) const override
+    std::optional<PluginOutboundDescriptor> Deserialize(const QString &url) const override
     {
-        PluginOutboundInfo outbound;
+        PluginOutboundDescriptor outbound;
         QUrl link{ url };
         QUrlQuery query{ link };
         if (!link.isValid())
@@ -160,28 +160,28 @@ class TrojanGoSerializer : public PluginOutboundHandler
         return outbound;
     }
 
-    std::optional<PluginOutboundData> GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
+    std::optional<PluginIOBoundData> GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
     {
         if (protocol == "trojan-go")
-            return PluginOutboundData{
-                { DATA_KEY_SERVER, outbound["server"].toString() }, //
-                { DATA_KEY_PORT, outbound["port"].toInt() },        //
-                { DATA_KEY_PROTOCOL, protocol },
-                { DATA_KEY_SNI, outbound["sni"] } //
+            return PluginIOBoundData{
+                { IOBOUND::ADDRESS, outbound["server"].toString() }, //
+                { IOBOUND::PORT, outbound["port"].toInt() },         //
+                { IOBOUND::PROTOCOL, protocol },
+                { IOBOUND::SNI, outbound["sni"] } //
             };
         return {};
     }
 
-    bool SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginOutboundData &info) const override
+    bool SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginIOBoundData &info) const override
     {
         if (protocol != "trojan-go")
             return false;
-        if (info.contains(DATA_KEY_PORT))
-            outbound["port"] = info[DATA_KEY_PORT].toInt();
-        if (info.contains(DATA_KEY_SERVER))
-            outbound["server"] = info[DATA_KEY_SERVER].toInt();
-        if (info.contains(DATA_KEY_SNI))
-            outbound["sni"] = info[DATA_KEY_SNI].toString();
+        if (info.contains(IOBOUND::PORT))
+            outbound["port"] = info[IOBOUND::PORT].toInt();
+        if (info.contains(IOBOUND::ADDRESS))
+            outbound["server"] = info[IOBOUND::ADDRESS].toInt();
+        if (info.contains(IOBOUND::SNI))
+            outbound["sni"] = info[IOBOUND::SNI].toString();
         return true;
     }
 

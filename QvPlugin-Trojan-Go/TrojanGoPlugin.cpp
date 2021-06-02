@@ -6,13 +6,10 @@
 #include <QLabel>
 #include <QMetaEnum>
 
-bool QvTrojanGoPlugin::InitializePlugin(const QString &, const QJsonObject &_settings)
+bool QvTrojanGoPlugin::InitializePlugin()
 {
-    emit PluginLog("Initialize plugin.");
-    this->settings = _settings;
-    QvTrojanGoPluginInstance = this;
-    outboundHandler = std::make_shared<TrojanGoSerializer>();
-    kernelInterface = std::make_unique<TrojanGoPluginKernelInterface>();
-    guiInterface = new TrojanGoGUIInterface();
+    m_OutboundHandler = std::make_shared<TrojanGoSerializer>();
+    m_KernelInterface = std::make_unique<TrojanGoPluginKernelInterface>();
+    m_GUIInterface = new TrojanGoGUIInterface();
     return true;
 }

@@ -8,13 +8,11 @@
 #include <QLabel>
 #include <QMetaEnum>
 
-bool NaiveProxyPlugin::InitializePlugin(const QString &, const QJsonObject &_settings)
+bool NaiveProxyPlugin::InitializePlugin()
 {
-    this->settings = _settings;
-    NaiveProxyPluginInstance = this;
     emit PluginLog("Initializing NaiveProxy plugin.");
-    this->outboundHandler = std::make_unique<NaiveProxyOutboundHandler>();
-    this->kernelInterface = std::make_shared<NaiveKernelInterface>();
-    this->guiInterface = new NaiveUIInterface();
+    m_OutboundHandler = std::make_unique<NaiveProxyOutboundHandler>();
+    m_KernelInterface = std::make_shared<NaiveKernelInterface>();
+    m_GUIInterface = new NaiveUIInterface();
     return true;
 }

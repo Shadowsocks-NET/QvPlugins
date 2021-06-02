@@ -21,26 +21,20 @@ class CommandPlugin
     // Basic metainfo of this plugin
     const QvPluginMetadata GetMetadata() const override
     {
-        return QvPluginMetadata{
-            "Qv2ray Command Plugin",                             //
-            "Qv2ray Workgroup",                                  //
-            "qvplugin_command",                                  //
-            "Run any command when an event from Qv2ray occurs.", //
-            "v3.0.0",                                            //
-            "Qv2ray/QvPlugin-Command",                           //
-            {
-                COMPONENT_EVENT_HANDLER, //
-                COMPONENT_GUI            //
-            },
-            UPDATE_GITHUB_RELEASE //
-        };
+        return QvPluginMetadata{ "Qv2ray Command Plugin",                             //
+                                 "Qv2ray Workgroup",                                  //
+                                 "qvplugin_command",                                  //
+                                 "Run any command when an event from Qv2ray occurs.", //
+                                 "",                                                  //
+                                 {
+                                     COMPONENT_EVENT_HANDLER, //
+                                     COMPONENT_GUI            //
+                                 } };
     }
-    bool InitializePlugin(const QString &, const QJsonObject &) override;
+    bool InitializePlugin() override;
     void SettingsUpdated() override{};
 
   signals:
     void PluginLog(QString) const override;
     void PluginErrorMessageBox(QString, QString) const override;
 };
-
-DECLARE_PLUGIN_INSTANCE(CommandPlugin);

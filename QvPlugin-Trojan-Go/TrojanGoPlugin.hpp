@@ -20,27 +20,21 @@ class QvTrojanGoPlugin
     // Basic metainfo of this plugin
     const QvPluginMetadata GetMetadata() const override
     {
-        return QvPluginMetadata{
-            "Trojan-Go Plugin",                                 //
-            "Qv2ray Workgroup",                                 //
-            "qvtrojango_plugin",                                //
-            "Connect to Trojan-GFW/Trojan-Go server in Qv2ray", //
-            "v3.0.0",                                           //
-            "Qv2ray/QvPlugin-Command",                          //
-            {
-                COMPONENT_GUI,             //
-                COMPONENT_KERNEL,          //
-                COMPONENT_OUTBOUND_HANDLER //
-            },
-            UPDATE_GITHUB_RELEASE //
-        };
+        return QvPluginMetadata{ "Trojan-Go Plugin",                                 //
+                                 "Qv2ray Workgroup",                                 //
+                                 "qvtrojango_plugin",                                //
+                                 "Connect to Trojan-GFW/Trojan-Go server in Qv2ray", //
+                                 "",                                                 //
+                                 {
+                                     COMPONENT_GUI,             //
+                                     COMPONENT_KERNEL,          //
+                                     COMPONENT_OUTBOUND_HANDLER //
+                                 } };
     }
-    bool InitializePlugin(const QString &, const QJsonObject &) override;
+    bool InitializePlugin() override;
     void SettingsUpdated() override{};
 
   signals:
     void PluginLog(QString) const override;
     void PluginErrorMessageBox(QString, QString) const override;
 };
-
-DECLARE_PLUGIN_INSTANCE(QvTrojanGoPlugin);
