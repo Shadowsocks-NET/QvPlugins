@@ -1,9 +1,8 @@
 #include "TrojanGoOutboundWidget.hpp"
 
-TrojanGoOutboundWidget::TrojanGoOutboundWidget(QWidget *parent) : Qv2rayPlugin::QvPluginEditor(parent)
+TrojanGoOutboundWidget::TrojanGoOutboundWidget(QWidget *parent) : Qv2rayPlugin::Gui::PluginProtocolEditor(parent)
 {
     setupUi(this);
-    SetContent({});
 }
 
 void TrojanGoOutboundWidget::changeEvent(QEvent *e)
@@ -56,4 +55,22 @@ void TrojanGoOutboundWidget::on_typeCombo_currentIndexChanged(int index)
 void TrojanGoOutboundWidget::on_muxCB_stateChanged(int arg1)
 {
     config.mux = arg1 == Qt::Checked;
+}
+
+void TrojanGoOutboundWidget::Load()
+{
+    config.loadJson(settings);
+    sniTxt->setText(config.sni);
+    hostTxt->setText(config.host);
+    pathTxt->setText(config.path);
+    typeCombo->setCurrentText(TRANSPORT_TYPE_STRING_MAP[config.type]);
+    encryptionTxt->setText(config.encryption);
+    passwordTxt->setText(config.password);
+    muxCB->setChecked(config.mux);
+    on_typeCombo_currentIndexChanged(typeCombo->currentIndex());
+}
+
+void TrojanGoOutboundWidget::Store()
+{
+    settings = IOProtocolSettings{ config.toJson() };
 }

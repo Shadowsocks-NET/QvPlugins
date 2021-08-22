@@ -1,7 +1,10 @@
 project(QvPlugin-Command)
 cmake_minimum_required(VERSION 3.1.0)
-include(${CMAKE_SOURCE_DIR}/plugin-interface/QvPluginInterface.cmake)
-add_library(${PROJECT_NAME} MODULE
+
+qv2ray_add_plugin(QvPlugin-Command Widgets
+    CLASS_NAME "CommandPlugin")
+
+target_sources(QvPlugin-Command PRIVATE
     CommandPlugin.hpp
     CommandPlugin.cpp
     core/EventHandler.cpp
@@ -13,5 +16,3 @@ add_library(${PROJECT_NAME} MODULE
     ui/CommandPluginSettings.ui
     resx.qrc
     )
-
-qv2ray_configure_plugin(${PROJECT_NAME} Widgets)

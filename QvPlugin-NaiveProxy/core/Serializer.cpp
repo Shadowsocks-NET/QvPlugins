@@ -2,13 +2,13 @@
 
 #include <QUrlQuery>
 
-std::optional<QString> NaiveProxyOutboundHandler::Serialize(const PluginOutboundDescriptor &info) const
+std::optional<QString> NaiveProxyOutboundHandler::Serialize(const QString &name, const IOConnectionSettings &outbound) const
 {
-    if (info.Protocol != "naive")
+    if (outbound.protocol != "naive")
         return std::nullopt;
 
     QUrl url;
-    const auto object = info.Outbound;
+    const auto object = outbound.protocolSettings;
     if (const auto protocol = object["protocol"].toString(); protocol != "https" && protocol != "quic")
         url.setScheme("naive+https");
     else
@@ -29,51 +29,44 @@ std::optional<QString> NaiveProxyOutboundHandler::Serialize(const PluginOutbound
     QUrlQuery query;
     query.setQueryItems({ { "padding", object["padding"].toBool() ? "true" : "false" } });
     url.setQuery(query);
-    url.setFragment(info.ConnectionName);
+    url.setFragment(name);
 
     return url.toString();
 }
 
-std::optional<PluginOutboundDescriptor> NaiveProxyOutboundHandler::Deserialize(const QString &link) const
+std::optional<std::pair<QString, IOConnectionSettings>> NaiveProxyOutboundHandler::Deserialize(const QString &link) const
 {
-    PluginOutboundDescriptor info;
+    IOConnectionSettings info;
     QUrl url(link);
     if (!url.isValid())
         return std::nullopt;
 
     const auto name = url.fragment();
-    info.ConnectionName = name.isEmpty() ? QString("[%1]-%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port()) : name;
+    const auto newName = name.isEmpty() ? QString("[%1]-%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port()) : name;
 
     const QStringList trueList = { "1", "true", "yes", "y", "on" };
     const auto usePadding = trueList.contains(QUrlQuery{ url }.queryItemValue("padding").toLower());
 
-    info.Outbound = QJsonObject{ { "protocol", url.scheme() },   //
-                                 { "host", url.host() },         //
-                                 { "port", url.port(443) },      //
-                                 { "username", url.userName() }, //
-                                 { "password", url.password() }, //
-                                 { "padding", usePadding } };
-    info.Protocol = "naive";
-    return info;
+    info.protocolSettings = IOProtocolSettings{ QJsonObject{ { "protocol", url.scheme() },   //
+                                                             { "host", url.host() },         //
+                                                             { "port", url.port(443) },      //
+                                                             { "username", url.userName() }, //
+                                                             { "password", url.password() }, //
+                                                             { "padding", usePadding } } };
+    info.protocol = "naive";
+    return std::make_pair(newName, info);
 }
 
-bool NaiveProxyOutboundHandler::SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginIOBoundData &info) const
+bool NaiveProxyOutboundHandler::SetOutboundInfo(IOConnectionSettings &outbound, const PluginIOBoundData &info) const
 {
-    if (protocol != "naive")
+    if (outbound.protocol != "naive")
         return false;
-    if (info.contains(IOBOUND::ADDRESS))
-        outbound["host"] = info[IOBOUND::ADDRESS].toString();
-    if (info.contains(IOBOUND::PORT))
-        outbound["port"] = info[IOBOUND::PORT].toInt();
-    if (info.contains(IOBOUND::SNI))
-        outbound["sni"] = info[IOBOUND::SNI].toString();
+    if (info.contains(IOBOUND_DATA_TYPE::IO_SNI))
+        outbound.protocolSettings["sni"] = info[IOBOUND_DATA_TYPE::IO_SNI].toString();
     return true;
 }
 
-std::optional<PluginIOBoundData> NaiveProxyOutboundHandler::GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const
+std::optional<PluginIOBoundData> NaiveProxyOutboundHandler::GetOutboundInfo(const IOConnectionSettings &outbound) const
 {
-    return PluginIOBoundData{ { IOBOUND::PROTOCOL, protocol },
-                              { IOBOUND::ADDRESS, outbound["host"].toString() },
-                              { IOBOUND::PORT, outbound["port"].toInt() },
-                              { IOBOUND::SNI, outbound["sni"].toString() } };
+    return PluginIOBoundData{ { IOBOUND_DATA_TYPE::IO_SNI, outbound.protocolSettings["sni"].toString() } };
 }

@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 
-TrojanGoSettingsWidget::TrojanGoSettingsWidget(QWidget *parent) : Qv2rayPlugin::PluginSettingsWidget(parent)
+TrojanGoSettingsWidget::TrojanGoSettingsWidget(QWidget *parent) : Qv2rayPlugin::Gui::PluginSettingsWidget(parent)
 {
     setupUi(this);
 }
@@ -62,7 +62,7 @@ void TrojanGoSettingsWidget::on_selectKernelBtn_clicked()
     }
 
     // debounce: recover in 800ms
-    debounceTimer.singleShot(800, this, &TrojanGoSettingsWidget::debounceUnfreeze);
+    debounceTimer.singleShot(800ms, this, &TrojanGoSettingsWidget::debounceUnfreeze);
 }
 
 void TrojanGoSettingsWidget::debounceUnfreeze()
@@ -166,4 +166,14 @@ void TrojanGoSettingsWidget::on_testKernelBtn_clicked()
 
     QString output = process.readAllStandardOutput();
     QMessageBox::information(this, tr("Trojan-Go Test Result"), output);
+}
+
+
+void TrojanGoSettingsWidget::Load()
+{
+    kernelPathTxt->setText(settings["kernelPath"].toString());
+}
+
+void TrojanGoSettingsWidget::Store()
+{
 }

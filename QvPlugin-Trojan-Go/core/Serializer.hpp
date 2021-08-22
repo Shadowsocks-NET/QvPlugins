@@ -1,6 +1,6 @@
 #pragma once
 #include "Common.hpp"
-#include "handlers/OutboundHandler.hpp"
+#include "QvPlugin/Handlers/OutboundHandler.hpp"
 
 #include <QObject>
 #include <QUrl>
@@ -10,21 +10,21 @@
 
 using namespace Qv2rayPlugin;
 
-class TrojanGoSerializer : public PluginOutboundHandler
+class TrojanGoSerializer : public Qv2rayPlugin::Outbound::IOutboundProcessor
 {
   public:
-    explicit TrojanGoSerializer() : PluginOutboundHandler(){};
-    std::optional<QString> Serialize(const PluginOutboundDescriptor &outbound) const override
+    explicit TrojanGoSerializer() : Qv2rayPlugin::Outbound::IOutboundProcessor(){};
+    std::optional<QString> Serialize(const QString &name, const IOConnectionSettings &outbound) const override
     {
         TrojanGoShareLinkObject obj;
-        obj.loadJson(outbound.Outbound);
+        obj.loadJson(outbound.protocolSettings);
         QUrl url;
         QUrlQuery query;
-        url.setScheme(outbound.Protocol);
+        url.setScheme(outbound.protocol);
         url.setHost(obj.server);
         url.setPort(obj.port);
         url.setUserInfo(obj.password);
-        url.setFragment(outbound.ConnectionName);
+        url.setFragment(name);
         url.setPath("/");
         //
         query.addQueryItem("type", TRANSPORT_TYPE_STRING_MAP[obj.type]);
@@ -50,9 +50,9 @@ class TrojanGoSerializer : public PluginOutboundHandler
         return url.toString(QUrl::FullyEncoded);
     }
 
-    std::optional<PluginOutboundDescriptor> Deserialize(const QString &url) const override
+    std::optional<std::pair<QString, IOConnectionSettings>> Deserialize(const QString &url) const override
     {
-        PluginOutboundDescriptor outbound;
+        IOConnectionSettings outbound;
         QUrl link{ url };
         QUrlQuery query{ link };
         if (!link.isValid())
@@ -154,34 +154,25 @@ class TrojanGoSerializer : public PluginOutboundHandler
                 return std::nullopt;
         }
 
-        outbound.ConnectionName = link.fragment(QUrl::FullyDecoded);
-        outbound.Protocol = "trojan-go";
-        outbound.Outbound = info.toJson();
-        return outbound;
+        const auto name = link.fragment(QUrl::FullyDecoded);
+        outbound.protocol = "trojan-go";
+        outbound.protocolSettings = IOProtocolSettings{ info.toJson() };
+        return std::make_pair(name, outbound);
     }
 
-    std::optional<PluginIOBoundData> GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
+    std::optional<PluginIOBoundData> GetOutboundInfo(const IOConnectionSettings &outbound) const override
     {
-        if (protocol == "trojan-go")
-            return PluginIOBoundData{
-                { IOBOUND::ADDRESS, outbound["server"].toString() }, //
-                { IOBOUND::PORT, outbound["port"].toInt() },         //
-                { IOBOUND::PROTOCOL, protocol },
-                { IOBOUND::SNI, outbound["sni"] } //
-            };
+        if (outbound.protocol == "trojan-go")
+            return PluginIOBoundData{ { IOBOUND_DATA_TYPE::IO_SNI, outbound.protocolSettings["sni"] } };
         return {};
     }
 
-    bool SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginIOBoundData &info) const override
+    bool SetOutboundInfo(IOConnectionSettings &outbound, const PluginIOBoundData &info) const override
     {
-        if (protocol != "trojan-go")
+        if (outbound.protocol != "trojan-go")
             return false;
-        if (info.contains(IOBOUND::PORT))
-            outbound["port"] = info[IOBOUND::PORT].toInt();
-        if (info.contains(IOBOUND::ADDRESS))
-            outbound["server"] = info[IOBOUND::ADDRESS].toInt();
-        if (info.contains(IOBOUND::SNI))
-            outbound["sni"] = info[IOBOUND::SNI].toString();
+        if (info.contains(IOBOUND_DATA_TYPE::IO_SNI))
+            outbound.protocolSettings["sni"] = info[IOBOUND_DATA_TYPE::IO_SNI].toString();
         return true;
     }
 

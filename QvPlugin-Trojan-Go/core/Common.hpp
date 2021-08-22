@@ -1,5 +1,5 @@
 #pragma once
-#include "QJsonStruct.hpp"
+#include "QvPlugin/Utils/JsonConversion.hpp"
 
 #include <QList>
 #include <QMap>
@@ -26,5 +26,5 @@ struct TrojanGoShareLinkObject
     QString path;
     QString encryption;
     QString plugin;
-    QJS_PLAIN_JSON(server, port, mux, password, sni, type, host, path, encryption, plugin)
+    QJS_JSON(F(server, port, mux, password, sni, type, host, path, encryption, plugin))
 };

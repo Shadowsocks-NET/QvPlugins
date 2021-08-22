@@ -1,34 +1,34 @@
 #pragma once
 
-#include "gui/QvGUIPluginInterface.hpp"
+#include "QvPlugin/Gui/QvGUIPluginInterface.hpp"
 #include "ui/OutboundEditor.hpp"
 #include "ui/SettingsWidget.hpp"
 
 using namespace Qv2rayPlugin;
 
-class NaiveUIInterface : public Qv2rayPlugin::Qv2rayGUIInterface
+class NaiveUIInterface : public Qv2rayPlugin::Gui::Qv2rayGUIInterface
 {
     QIcon Icon() const override
     {
         return QIcon(":/assets/naive.png");
     }
-    virtual std::unique_ptr<PluginSettingsWidget> createSettingsWidgets() const override
+    virtual std::unique_ptr<Qv2rayPlugin::Gui::PluginSettingsWidget> GetSettingsWidget() const override
     {
         return std::make_unique<SettingsWidget>();
     }
-    virtual QList<typed_plugin_editor> createInboundEditors() const override
+    virtual PluginEditorDescriptor GetInboundEditors() const override
     {
         return {};
     }
-    virtual QList<typed_plugin_editor> createOutboundEditors() const override
+    virtual PluginEditorDescriptor GetOutboundEditors() const override
     {
-        return { make_editor_info<OutboundEditor>("naive", "NaiveProxy") };
+        return { make_editor_info<NaiveOutboundEditor>("naive", "NaiveProxy") };
     }
-    virtual std::unique_ptr<PluginMainWindowWidget> createMainWindowWidget() const override
+    virtual std::unique_ptr<Qv2rayPlugin::Gui::PluginMainWindowWidget> GetMainWindowWidget() const override
     {
         return nullptr;
     }
-    virtual QList<QV2RAY_PLUGIN_GUI_COMPONENT_TYPE> GetComponents() const override
+    virtual QList<PLUGIN_GUI_COMPONENT_TYPE> GetComponents() const override
     {
         return { GUI_COMPONENT_SETTINGS, GUI_COMPONENT_OUTBOUND_EDITOR };
     }

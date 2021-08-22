@@ -1,18 +1,18 @@
 #pragma once
-#include "handlers/OutboundHandler.hpp"
+#include "QvPlugin/Handlers/OutboundHandler.hpp"
 
 #include <QObject>
 
-class NaiveProxyOutboundHandler : public PluginOutboundHandler
+class NaiveProxyOutboundHandler : public Qv2rayPlugin::Outbound::IOutboundProcessor
 {
   public:
-    explicit NaiveProxyOutboundHandler() : PluginOutboundHandler(){};
+    explicit NaiveProxyOutboundHandler() : Qv2rayPlugin::Outbound::IOutboundProcessor(){};
 
-    std::optional<QString> Serialize(const PluginOutboundDescriptor &outbound) const override;
-    std::optional<PluginOutboundDescriptor> Deserialize(const QString &link) const override;
+    virtual std::optional<QString> Serialize(const QString &name, const IOConnectionSettings &outbound) const override;
+    virtual std::optional<std::pair<QString, IOConnectionSettings>> Deserialize(const QString &link) const override;
 
-    std::optional<PluginIOBoundData> GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override;
-    bool SetOutboundInfo(const QString &protocol, QJsonObject &outbound, const PluginIOBoundData &info) const override;
+    virtual std::optional<PluginIOBoundData> GetOutboundInfo(const IOConnectionSettings &outbound) const override;
+    virtual bool SetOutboundInfo(IOConnectionSettings &outbound, const PluginIOBoundData &info) const override;
 
     QList<QString> SupportedProtocols() const override
     {

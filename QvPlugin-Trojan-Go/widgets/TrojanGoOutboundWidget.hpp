@@ -1,11 +1,11 @@
 #pragma once
 
+#include "QvPlugin/Gui/QvGUIPluginInterface.hpp"
 #include "core/Common.hpp"
-#include "gui/QvGUIPluginInterface.hpp"
 #include "ui_TrojanGoOutboundWidget.h"
 
 class TrojanGoOutboundWidget
-    : public Qv2rayPlugin::QvPluginEditor
+    : public Qv2rayPlugin::Gui::PluginProtocolEditor
     , private Ui::TrojanGoOutboundWidget
 {
     Q_OBJECT
@@ -13,38 +13,12 @@ class TrojanGoOutboundWidget
   public:
     explicit TrojanGoOutboundWidget(QWidget *parent = nullptr);
 
-    void SetHostAddress(const QString &address, int port) override
-    {
-        config.server = address;
-        config.port = port;
-    }
-
-    QPair<QString, int> GetHostAddress() const override
-    {
-        return { config.server, config.port };
-    }
-
-    void SetContent(const QJsonObject &o) override
-    {
-        config.loadJson(o);
-        sniTxt->setText(config.sni);
-        hostTxt->setText(config.host);
-        pathTxt->setText(config.path);
-        typeCombo->setCurrentText(TRANSPORT_TYPE_STRING_MAP[config.type]);
-        encryptionTxt->setText(config.encryption);
-        passwordTxt->setText(config.password);
-        muxCB->setChecked(config.mux);
-        on_typeCombo_currentIndexChanged(typeCombo->currentIndex());
-    }
-
-    const QJsonObject GetContent() const override
-    {
-        return config.toJson();
-    }
-
   protected:
     TrojanGoShareLinkObject config;
     void changeEvent(QEvent *e) override;
+    virtual void Load() override;
+    virtual void Store() override;
+
   private slots:
     void on_sniTxt_textEdited(const QString &arg1);
     void on_typeCombo_currentIndexChanged(const QString &arg1);

@@ -3,26 +3,9 @@
 #include "CommandPlugin.hpp"
 #include "ui_CommandPluginSettings.h"
 
-CommandPluginSettings::CommandPluginSettings(QWidget *parent) : Qv2rayPlugin::PluginSettingsWidget(parent), ui(new Ui::CommandPluginSettings)
+CommandPluginSettings::CommandPluginSettings(QWidget *parent) : Qv2rayPlugin::Gui::PluginSettingsWidget(parent), ui(new Ui::CommandPluginSettings)
 {
     ui->setupUi(this);
-}
-
-void CommandPluginSettings::SetSettings(const QJsonObject &s)
-{
-    this->settings.loadJson(s);
-    ui->preConnTxt->setPlainText(settings.beforeConnection);
-    ui->postConnTxt->setPlainText(settings.afterConnection);
-    ui->preDisconnTxt->setPlainText(settings.beforeDisConnection);
-    ui->postDisconnTxt->setPlainText(settings.afterDisConnection);
-    //
-    ui->connCreateTxt->setPlainText(settings.connectionCreated);
-    ui->connRenameTxt->setPlainText(settings.connectionRenamed);
-    ui->connUpdateTxt->setPlainText(settings.connectionUpdated);
-    ui->connDeleteTxt->setPlainText(settings.connectionDeleted);
-    //
-    ui->setSystemProxyTxt->setPlainText(settings.setSystemProxy);
-    ui->clearSystemProxyTxt->setPlainText(settings.clearSystemProxy);
 }
 
 CommandPluginSettings::~CommandPluginSettings()
@@ -32,50 +15,72 @@ CommandPluginSettings::~CommandPluginSettings()
 
 void CommandPluginSettings::on_preConnTxt_textChanged()
 {
-    settings.beforeConnection = ui->preConnTxt->toPlainText();
+    settingsObject.beforeConnection = ui->preConnTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_postConnTxt_textChanged()
 {
-    settings.afterConnection = ui->postConnTxt->toPlainText();
+    settingsObject.afterConnection = ui->postConnTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_preDisconnTxt_textChanged()
 {
-    settings.beforeDisConnection = ui->preDisconnTxt->toPlainText();
+    settingsObject.beforeDisConnection = ui->preDisconnTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_postDisconnTxt_textChanged()
 {
-    settings.afterDisConnection = ui->postDisconnTxt->toPlainText();
+    settingsObject.afterDisConnection = ui->postDisconnTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_connCreateTxt_textChanged()
 {
-    settings.connectionCreated = ui->connCreateTxt->toPlainText();
+    settingsObject.connectionCreated = ui->connCreateTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_connRenameTxt_textChanged()
 {
-    settings.connectionRenamed = ui->connRenameTxt->toPlainText();
+    settingsObject.connectionRenamed = ui->connRenameTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_connUpdateTxt_textChanged()
 {
-    settings.connectionUpdated = ui->connUpdateTxt->toPlainText();
+    settingsObject.connectionUpdated = ui->connUpdateTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_connDeleteTxt_textChanged()
 {
-    settings.connectionDeleted = ui->connDeleteTxt->toPlainText();
+    settingsObject.connectionDeleted = ui->connDeleteTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_setSystemProxyTxt_textChanged()
 {
-    settings.setSystemProxy = ui->setSystemProxyTxt->toPlainText();
+    settingsObject.setSystemProxy = ui->setSystemProxyTxt->toPlainText();
 }
 
 void CommandPluginSettings::on_clearSystemProxyTxt_textChanged()
 {
-    settings.clearSystemProxy = ui->clearSystemProxyTxt->toPlainText();
+    settingsObject.clearSystemProxy = ui->clearSystemProxyTxt->toPlainText();
+}
+
+void CommandPluginSettings::Load()
+{
+    this->settingsObject.loadJson(settings);
+    ui->preConnTxt->setPlainText(settingsObject.beforeConnection);
+    ui->postConnTxt->setPlainText(settingsObject.afterConnection);
+    ui->preDisconnTxt->setPlainText(settingsObject.beforeDisConnection);
+    ui->postDisconnTxt->setPlainText(settingsObject.afterDisConnection);
+    //
+    ui->connCreateTxt->setPlainText(settingsObject.connectionCreated);
+    ui->connRenameTxt->setPlainText(settingsObject.connectionRenamed);
+    ui->connUpdateTxt->setPlainText(settingsObject.connectionUpdated);
+    ui->connDeleteTxt->setPlainText(settingsObject.connectionDeleted);
+    //
+    ui->setSystemProxyTxt->setPlainText(settingsObject.setSystemProxy);
+    ui->clearSystemProxyTxt->setPlainText(settingsObject.clearSystemProxy);
+}
+
+void CommandPluginSettings::Store()
+{
+    settings = settingsObject.toJson();
 }

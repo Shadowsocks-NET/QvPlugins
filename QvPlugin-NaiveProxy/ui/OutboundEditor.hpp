@@ -1,31 +1,20 @@
 #pragma once
 
-#include "gui/QvGUIPluginInterface.hpp"
+#include "QvPlugin/Gui/QvGUIPluginInterface.hpp"
 #include "ui_OutboundEditor.h"
 
-class OutboundEditor
-    : public Qv2rayPlugin::QvPluginEditor
+class NaiveOutboundEditor
+    : public Qv2rayPlugin::Gui::PluginProtocolEditor
     , private Ui::OutboundEditor
 {
     Q_OBJECT
 
   public:
-    explicit OutboundEditor(QWidget *parent = nullptr);
-    void SetHostAddress(const QString &address, int port) override
-    {
-        root["host"] = address;
-        root["port"] = port;
-    }
-    QPair<QString, int> GetHostAddress() const override
-    {
-        return { root["host"].toString(), root["port"].toInt() };
-    }
-    //
-    void SetContent(const QJsonObject &) override;
-    const QJsonObject GetContent() const override
-    {
-        return root;
-    }
+    explicit NaiveOutboundEditor(QWidget *parent = nullptr);
+
+  public:
+    virtual void Load() override;
+    virtual void Store() override{};
 
   protected:
     void changeEvent(QEvent *e) override;

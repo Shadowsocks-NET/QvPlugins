@@ -1,23 +1,27 @@
 #pragma once
-#include "handlers/KernelHandler.hpp"
+#include "QvPlugin/Handlers/KernelHandler.hpp"
 
 #include <QProcess>
 
-inline QUuid NAIVE_KERNEL_ID = QUuid{ "39e1043f-7c2f-4287-9030-214bc62f94d8" };
-
-class QvTrojanGoPluginKernel : public PluginKernel
+class QvTrojanGoPluginKernel : public Qv2rayPlugin::Kernel::PluginKernel
 {
     Q_OBJECT
+
   public:
-    explicit QvTrojanGoPluginKernel();
-    /// Kernel related operations
-    void SetConnectionSettings(const QMap<KernelOptionFlags, QVariant> &settings, const QJsonObject &connectionInfo) override;
-    bool Start() override;
+    QvTrojanGoPluginKernel();
+    void SetConnectionSettings(const QMap<Qv2rayPlugin::Kernel::KernelOptionFlags, QVariant> &settings, const IOConnectionSettings &connectionInfo) override;
+    void Start() override;
     bool Stop() override;
-    QUuid KernelId() const override
+    virtual bool PrepareConfigurations() override;
+    virtual KernelId GetKernelId() const override
     {
-        return NAIVE_KERNEL_ID;
+        return KernelId{ "trojan-go-kernel" };
     }
+
+  signals:
+    void OnCrashed(const QString &);
+    void OnLog(const QString &);
+    void OnStatsAvailable(StatisticsObject);
 
   private slots:
     void OnProcessOutputReadyRead(int);
@@ -32,16 +36,16 @@ class QvTrojanGoPluginKernel : public PluginKernel
     bool isStarted;
 };
 
-class TrojanGoPluginKernelInterface : public PluginKernelInterface
+class TrojanGoPluginKernelInterface : public Qv2rayPlugin::Kernel::IKernelHandler
 {
   public:
-    QList<KernelInfo> GetKernels() const override
+    virtual QList<Qv2rayPlugin::Kernel::KernelFactory> PluginKernels() const override
     {
-        KernelInfo trojan_go;
+        Qv2rayPlugin::Kernel::KernelFactory trojan_go;
         trojan_go.Create = []() { return std::make_unique<QvTrojanGoPluginKernel>(); };
-        trojan_go.Id = NAIVE_KERNEL_ID;
+        trojan_go.Id = KernelId{ "trojan-go-kernel" };
         trojan_go.Name = "Trojan-Go";
         trojan_go.SupportedProtocols = { "trojan", "trojan-go" };
-        return QList<KernelInfo>{} << trojan_go;
+        return QList<Qv2rayPlugin::Kernel::KernelFactory>{} << trojan_go;
     }
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gui/QvGUIPluginInterface.hpp"
+#include "QvPlugin/Gui/QvGUIPluginInterface.hpp"
 #include "ui_TrojanGoSettingsWidget.h"
 
 #include <QTimer>
@@ -14,22 +14,15 @@ enum KernelPathCheckerResult : char
 };
 
 class TrojanGoSettingsWidget
-    : public Qv2rayPlugin::PluginSettingsWidget
+    : public Qv2rayPlugin::Gui::PluginSettingsWidget
     , private Ui::TrojanGoSettingsWidget
 {
     Q_OBJECT
 
   public:
     explicit TrojanGoSettingsWidget(QWidget *parent = nullptr);
-    void SetSettings(const QJsonObject &s) override
-    {
-        settings = s;
-        kernelPathTxt->setText(settings["kernelPath"].toString());
-    }
-    QJsonObject GetSettings() override
-    {
-        return settings;
-    }
+    virtual void Load() override;
+    virtual void Store() override;
 
   protected:
     void changeEvent(QEvent *e) override;
@@ -42,7 +35,6 @@ class TrojanGoSettingsWidget
     void on_testKernelBtn_clicked();
 
   private:
-    QJsonObject settings;
     QTimer debounceTimer;
 
   private:

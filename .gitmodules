@@ -1,3 +1,9 @@
 [submodule "plugin-interface"]
 	path = plugin-interface
-	url = https://github.com/Shadowsocks-NET/QvPlugin-Interface.git
+	url = https://github.com/Shadowsocks-NET/Qv2rayBase-PluginInterface.git
+[submodule "QvPlugin-LatencyTest/3rdparty/libuv"]
+	path = QvPlugin-LatencyTest/3rdparty/libuv
+	url = https://github.com/libuv/libuv.git
+[submodule "QvPlugin-LatencyTest/3rdparty/uvw"]
+	path = QvPlugin-LatencyTest/3rdparty/uvw
+	url = https://github.com/skypjack/uvw.git

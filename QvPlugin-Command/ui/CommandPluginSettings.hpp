@@ -1,6 +1,6 @@
 #pragma once
+#include "QvPlugin/Gui/QvGUIPluginInterface.hpp"
 #include "core/CommandConfig.hpp"
-#include "gui/QvGUIPluginInterface.hpp"
 
 #include <QWidget>
 
@@ -9,19 +9,15 @@ namespace Ui
     class CommandPluginSettings;
 }
 
-class CommandPluginSettings : public Qv2rayPlugin::PluginSettingsWidget
+class CommandPluginSettings : public Qv2rayPlugin::Gui::PluginSettingsWidget
 {
     Q_OBJECT
   public:
     explicit CommandPluginSettings(QWidget *parent = nullptr);
     ~CommandPluginSettings();
 
-    void SetSettings(const QJsonObject &s) override;
-
-    QJsonObject GetSettings() override
-    {
-        return settings.toJson();
-    }
+    virtual void Load() override;
+    virtual void Store() override;
 
   private slots:
     void on_preConnTxt_textChanged();
@@ -36,6 +32,6 @@ class CommandPluginSettings : public Qv2rayPlugin::PluginSettingsWidget
     void on_clearSystemProxyTxt_textChanged();
 
   private:
-    CommandPluginConfig settings;
+    CommandPluginConfig settingsObject;
     Ui::CommandPluginSettings *ui;
 };

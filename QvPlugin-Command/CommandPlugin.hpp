@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QvPluginInterface.hpp"
+#include "QvPlugin/PluginInterface.hpp"
 #include "core/CommandConfig.hpp"
 #include "core/EventHandler.hpp"
 
@@ -11,11 +11,11 @@ using namespace Qv2rayPlugin;
 
 class CommandPlugin
     : public QObject
-    , public Qv2rayInterface
+    , public Qv2rayInterface<CommandPlugin>
 {
-    Q_INTERFACES(Qv2rayPlugin::Qv2rayInterface)
-    Q_PLUGIN_METADATA(IID Qv2rayInterface_IID)
     Q_OBJECT
+    QV2RAY_PLUGIN(CommandPlugin)
+
   public:
     //
     // Basic metainfo of this plugin
@@ -23,9 +23,9 @@ class CommandPlugin
     {
         return QvPluginMetadata{ "Qv2ray Command Plugin",                             //
                                  "Qv2ray Workgroup",                                  //
-                                 "qvplugin_command",                                  //
+                                 PluginId{ "qvplugin_command" },                      //
                                  "Run any command when an event from Qv2ray occurs.", //
-                                 "",                                                  //
+                                 QUrl{},                                              //
                                  {
                                      COMPONENT_EVENT_HANDLER, //
                                      COMPONENT_GUI            //
@@ -33,8 +33,4 @@ class CommandPlugin
     }
     bool InitializePlugin() override;
     void SettingsUpdated() override{};
-
-  signals:
-    void PluginLog(QString) const override;
-    void PluginErrorMessageBox(QString, QString) const override;
 };

@@ -11,13 +11,17 @@ on:
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
+  release:
+    types: [prereleased]
 
-env:
-  BUILD_TYPE: Release
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
@@ -34,25 +38,44 @@ jobs:
         arch: x64
 
     - name: Setup Ninja
-      uses: ashutoshvarma/setup-ninja@v1.1
+      uses: seanmiddleditch/gha-setup-ninja@v3
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: 6.1.0
+        version: 6.2.0
         arch: win64_msvc2019_64
+        aqtversion: ==1.2.2
 
-    - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=installed -GNinja -DALL_PLUGINS=ON
+    - name: Install Vulkan SDK
+      if: matrix.platform != 'macos-latest'
+      uses: humbletim/setup-vulkan-sdk@v1.0.2
 
-    - name: Build
-      run: cmake --build ${{ github.workspace }}/build
+    - name: Build and Install
+      run: |
+        mkdir build; cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=installed \
+          -DALL_PLUGINS=ON \
+          -GNinja
+        cmake --build .
+        cmake --install .
 
-    - name: Installation
-      run: cmake --install ${{ github.workspace }}/build
+    - name: Generate 7zip
+      run: 7z a Plugins.7z -- build/installed/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: QvPlugin-${{ runner.os }}
-        path: installed/
+        name: QvPlugin-${{ runner.os }}.7z
+        path: Plugins.7z
+
+    - name: Upload to GitHub Release
+      uses: svenstaro/upload-release-action@v2
+      if: github.event_name == 'release'
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: Plugins.7z
+        asset_name: QvPlugin-${{ runner.os }}.7z
+        tag: ${{ github.ref }}
+        overwrite: true

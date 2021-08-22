@@ -1,24 +1,30 @@
 #pragma once
 
-#include "handlers/KernelHandler.hpp"
-#include "socks2http/HttpProxy.hpp"
+#include "QvPlugin/Handlers/KernelHandler.hpp"
+#include "QvPlugin/Socksify/HttpProxy.hpp"
 
 #include <QProcess>
 
 inline QUuid NAIVE_KERNEL_ID = QUuid{ "39e1043f-7c2f-4287-9030-214bc62f94d8" };
 
-class NaiveProxyKernel : public PluginKernel
+class NaiveProxyKernel : public Qv2rayPlugin::Kernel::PluginKernel
 {
+    Q_OBJECT
   public:
     explicit NaiveProxyKernel();
     virtual ~NaiveProxyKernel() = default;
-    bool Start() override;
-    bool Stop() override;
-    void SetConnectionSettings(const QMap<KernelOptionFlags, QVariant> &options, const QJsonObject &settings) override;
-    QUuid KernelId() const override
+    virtual void Start() override;
+    virtual bool Stop() override;
+    virtual void SetConnectionSettings(const QMap<Qv2rayPlugin::Kernel::KernelOptionFlags, QVariant> &settings, const IOConnectionSettings &connectionInfo) override;
+    virtual bool PrepareConfigurations() override;
+    virtual KernelId GetKernelId() const override
     {
-        return NAIVE_KERNEL_ID;
+        return KernelId{ "naiveproxy-kernel" };
     }
+  signals:
+    void OnCrashed(const QString &);
+    void OnLog(const QString &);
+    void OnStatsAvailable(StatisticsObject);
 
   private:
     QString protocol;
@@ -29,7 +35,6 @@ class NaiveProxyKernel : public PluginKernel
     bool padding;
     int port;
     QProcess process;
-    //
     QString sni;
 
   private:
@@ -39,17 +44,16 @@ class NaiveProxyKernel : public PluginKernel
     Qv2rayPlugin::Utils::HttpProxy httpProxy;
 };
 
-class NaiveKernelInterface : public PluginKernelInterface
+class NaiveKernelInterface : public Qv2rayPlugin::Kernel::IKernelHandler
 {
   public:
-  public:
-    QList<KernelInfo> GetKernels() const override
+    virtual QList<Qv2rayPlugin::Kernel::KernelFactory> PluginKernels() const override
     {
-        KernelInfo naive;
+        Qv2rayPlugin::Kernel::KernelFactory naive;
         naive.Create = []() { return std::make_unique<NaiveProxyKernel>(); };
-        naive.Id = NAIVE_KERNEL_ID;
-        naive.Name = "Trojan-Go";
-        naive.SupportedProtocols = { "trojan", "trojan-go" };
-        return QList<KernelInfo>{} << naive;
+        naive.Id = KernelId{ "naiveproxy-kernel" };
+        naive.Name = "NaiveProxy";
+        naive.SupportedProtocols = { "naiveproxy" };
+        return QList<Qv2rayPlugin::Kernel::KernelFactory>{} << naive;
     }
 };
